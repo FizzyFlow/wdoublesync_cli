@@ -1,0 +1,30 @@
+{
+  "name": "wdoublesync_cli",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CLI tool built on the wdoublesync library to sync local folders to Walrus decentralised storage on the Sui network. Stores versioned gzip-compressed snapshots and diffs inside an EndlessVector on-chain object. Supports Seal encryption, manifest-based fast change detection, and full version history with point-in-time restore.",
+  "bin": {
+    "wdoublesync": "./bin/wdoublesync.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pull:test": "mkdir -p test_pull && cd test_pull && node ../bin/wdoublesync.js pull 0x02ca68e6e6b5dc4b5a808c8478a38efa8fd158d368a3ae7325bb561fc9c199eb --chain testnet",
+    "push:test": "cd test_pull && node ../bin/wdoublesync.js push 0x02ca68e6e6b5dc4b5a808c8478a38efa8fd158d368a3ae7325bb561fc9c199eb --chain testnet",
+    "info:test": "cd test_pull && node ../bin/wdoublesync.js info 0x02ca68e6e6b5dc4b5a808c8478a38efa8fd158d368a3ae7325bb561fc9c199eb --chain testnet"
+  },
+  "keywords": [],
+  "author": "suidouble (https://github.com/suidouble)",
+  "license": "AGPL-3.0",
+  "packageManager": "pnpm@10.16.0",
+  "dependencies": {
+    "suidouble": "^2.17.0-3",
+    "@fizzyflow/doublesync": "^0.1.0",
+    "@fizzyflow/wdoublesync": "^0.1.1",
+    "@fizzyflow/endless-vector": "^0.0.10",
+    "@mysten/seal": "^1.1.3",
+    "@noble/ciphers": "^2.2.0"
+  },
+  "devDependencies": {
+    "walrus-seal-client-with-local": "file:../seal_walrus_localnet"
+  }
+}
