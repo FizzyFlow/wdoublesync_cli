@@ -2,7 +2,7 @@
 
 CLI tool to sync local folders to [Walrus](https://walrus.xyz) decentralised storage on the Sui network.
 
-Built on top of the [`wdoublesync`](https://github.com/suidouble/wdoublesync) library.
+Built on top of the [`wdoublesync`](https://github.com/fizzyFlow/wdoublesync) library.
 
 Each `push` stores a versioned, gzip-compressed snapshot (or diff) inside an [EndlessVector](https://github.com/fizzyFlow/endless_vector) on-chain object. Any past version can be restored at any time with `pull`. Folders can optionally be encrypted with [Seal](https://github.com/MystenLabs/seal).
 
@@ -105,8 +105,7 @@ The following are always excluded from snapshots: `node_modules`, `.git`, `.env`
 
 | Package | Role |
 |---|---|
-| `wdoublesync` | Folder-diff / snapshot layer |
-| `doublesync` | Core CDC store and snapshot primitives |
+| `@fizzyflow/wdoublesync` | Folder-diff / snapshot layer |
+| `@fizzyflow/doublesync` | Core CDC store and snapshot primitives |
 | `@fizzyflow/endless-vector` | On-chain EndlessVector (Sui + Walrus + Seal) |
 | `suidouble` | Sui client / key management |
-| `walrus-seal-client-with-local` | Walrus + Seal client (supports localnet) |
