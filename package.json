@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "pull:test": "mkdir -p test_pull && cd test_pull && node ../bin/wdoublesync.js pull 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
     "push:test": "cd test_pull && node ../bin/wdoublesync.js push 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
-    "info:test": "cd test_pull && node ../bin/wdoublesync.js info 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet"
+    "pushfull:test": "cd test_pull && node ../bin/wdoublesync.js push 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet --force-snapshot",
+    "info:test": "cd test_pull && node ../bin/wdoublesync.js info 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
+    "watch:test": "cd test_pull && node ../bin/wdoublesync.js watch 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet"
   },
   "keywords": [],
   "author": "suidouble (https://github.com/suidouble)",
@@ -19,7 +21,7 @@
   "dependencies": {
     "suidouble": "^2.17.0-3",
     "@fizzyflow/doublesync": "^0.1.0",
-    "@fizzyflow/wdoublesync": "^0.1.2",
+    "@fizzyflow/wdoublesync": "^0.1.3",
     "@fizzyflow/endless-vector": "^0.0.12",
     "@mysten/seal": "^1.1.3",
     "@noble/ciphers": "^2.2.0"
