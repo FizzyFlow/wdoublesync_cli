@@ -8,11 +8,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pull:test": "mkdir -p test_pull && cd test_pull && node ../bin/wdoublesync.js pull 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
-    "push:test": "cd test_pull && node ../bin/wdoublesync.js push 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
-    "pushfull:test": "cd test_pull && node ../bin/wdoublesync.js push 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet --force-snapshot",
-    "info:test": "cd test_pull && node ../bin/wdoublesync.js info 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet",
-    "watch:test": "cd test_pull && node ../bin/wdoublesync.js watch 0x43d1d73aadb10aff8d3a4bfc592c7eff24312e04f77e3947a73bbfbb05b6f482 --chain testnet"
+    "pull:test": "mkdir -p test_pull && cd test_pull && node ../bin/wdoublesync.js pull 0x69d7d77c55d66c4c6d0a87d120caf0535fdbb3c8c414658f81f66a4d50c80120 --chain testnet",
+    "push:test": "cd test_pull && node ../bin/wdoublesync.js push 0x69d7d77c55d66c4c6d0a87d120caf0535fdbb3c8c414658f81f66a4d50c80120 --chain testnet",
+    "pushfull:test": "cd test_pull && node ../bin/wdoublesync.js push 0x69d7d77c55d66c4c6d0a87d120caf0535fdbb3c8c414658f81f66a4d50c80120 --chain testnet --force-snapshot",
+    "info:test": "cd test_pull && node ../bin/wdoublesync.js info 0x69d7d77c55d66c4c6d0a87d120caf0535fdbb3c8c414658f81f66a4d50c80120 --chain testnet",
+    "watch:test": "cd test_pull && node ../bin/wdoublesync.js watch 0x69d7d77c55d66c4c6d0a87d120caf0535fdbb3c8c414658f81f66a4d50c80120 --chain testnet"
   },
   "keywords": [],
   "author": "suidouble (https://github.com/suidouble)",
