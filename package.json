@@ -1,6 +1,6 @@
 {
   "name": "wdoublesync_cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "CLI tool built on the wdoublesync library to sync local folders to Walrus decentralised storage on the Sui network. Stores versioned gzip-compressed snapshots and diffs inside an EndlessVector on-chain object. Supports Seal encryption, manifest-based fast change detection, and full version history with point-in-time restore.",
   "bin": {
@@ -21,8 +21,8 @@
   "dependencies": {
     "suidouble": "^2.17.0-3",
     "@fizzyflow/doublesync": "^0.1.0",
-    "@fizzyflow/wdoublesync": "^0.1.6",
-    "@fizzyflow/endless-vector": "^0.0.12",
+    "@fizzyflow/wdoublesync": "^0.1.7",
+    "@fizzyflow/endless-vector": "^0.0.13",
     "@mysten/seal": "^1.1.3",
     "@noble/ciphers": "^2.2.0"
   },
