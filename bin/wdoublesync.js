@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { push, pull, info, watch } from '../lib/commands.js';
+import { push, pull, info, watch, rebate } from '../lib/commands.js';
 
 const USAGE = `wdoublesync — sync local folders to EndlessVector on Sui+Walrus
 
@@ -9,6 +9,7 @@ Usage:
   wdoublesync pull <vector-id> [options]   Restore vector contents to current folder
   wdoublesync info <vector-id> [options]   Show vector metadata
   wdoublesync watch <vector-id> [options]  Watch folder and auto-push/pull
+  wdoublesync rebate <vector-id> [options] Archive history, burn archives, push fresh snapshot
 
 Options:
   --chain <name>            Chain: mainnet, testnet, devnet, localnet (default: testnet)
@@ -105,6 +106,8 @@ try {
         await info(args);
     } else if (args.command === 'watch') {
         await watch(args);
+    } else if (args.command === 'rebate') {
+        await rebate(args);
     } else {
         console.error('Unknown command:', args.command);
         console.log(USAGE);
