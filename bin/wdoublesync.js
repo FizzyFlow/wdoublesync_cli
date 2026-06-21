@@ -1,6 +1,17 @@
 #!/usr/bin/env node
 
-import { push, pull, info, watch, rebate } from '../lib/commands.js';
+// Intercept process.exit() calls from dependencies so they don't interrupt
+// the top-level await before it settles. Converts them to thrown errors that
+// our try/catch handles, then sets process.exitCode without calling exit().
+const _realExit = process.exit.bind(process);
+process.exit = (code) => {
+    const err = new Error(`process.exit(${code ?? 0})`);
+    err._isProcessExit = true;
+    err._exitCode = code ?? 0;
+    throw err;
+};
+
+import { push, pull, info, watch, rebate } from '../lib/commands/index.js';
 
 const USAGE = `wdoublesync — sync local folders to EndlessVector on Sui+Walrus
 
@@ -31,6 +42,7 @@ function parseArgs(argv) {
     const args = {
         command: null,
         vectorId: null,
+        path: process.cwd(),
         chain: 'testnet',
         key: null,
         phrase: null,
@@ -49,17 +61,29 @@ function parseArgs(argv) {
 
     if (raw.length === 0 || raw.includes('--help')) {
         console.log(USAGE);
-        process.exit(0);
+        _realExit(0);
     }
 
     args.command = raw[0];
 
     let i = 1;
 
-    // Next positional arg is vector-id if it looks like one (starts with 0x)
-    if (i < raw.length && !raw[i].startsWith('--')) {
-        args.vectorId = raw[i];
+    // Collect up to two positional args: [vectorId] [path]
+    // vectorId starts with 0x, path starts with /, ~, or .
+    const positionals = [];
+    while (i < raw.length && !raw[i].startsWith('--')) {
+        positionals.push(raw[i]);
         i++;
+    }
+    if (positionals.length === 2) {
+        args.vectorId = positionals[0];
+        args.path = positionals[1];
+    } else if (positionals.length === 1) {
+        if (positionals[0].startsWith('0x')) {
+            args.vectorId = positionals[0];
+        } else {
+            args.path = positionals[0];
+        }
     }
 
     while (i < raw.length) {
@@ -97,6 +121,12 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv);
 
+// The Sui/Walrus SDKs use undici (Node.js fetch) which unref's its HTTP connections.
+// With only unref'd I/O in flight, the event loop drains and Node.js exits with code 13
+// ("Detected unsettled top-level await") before network responses arrive.
+// A ref'd interval keeps the event loop alive for the duration of the command.
+const keepAlive = setInterval(() => {}, 60_000);
+
 try {
     if (args.command === 'push') {
         await push(args);
@@ -111,11 +141,16 @@ try {
     } else {
         console.error('Unknown command:', args.command);
         console.log(USAGE);
-        process.exit(1);
+        process.exitCode = 1;
     }
-    process.exit(0);
 } catch (err) {
-    console.error('Error:', err.message);
-    if (err.stack) console.error(err.stack);
-    process.exit(1);
+    if (err._isProcessExit) {
+        process.exitCode = err._exitCode;
+    } else {
+        console.error('Error:', err.message);
+        if (err.stack) console.error(err.stack);
+        process.exitCode = 1;
+    }
+} finally {
+    clearInterval(keepAlive);
 }
