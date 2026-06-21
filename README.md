@@ -8,7 +8,7 @@ Each `push` stores a versioned, gzip-compressed diff or shapshot inside an [Endl
 
 ## AI Agent Skill
 
-wdoublesync ships with a [SKILL.md](https://github.com/FizzyFlow/wdoublesync_cli/SKILL.md) that teaches AI coding agents how to use it autonomously. Once loaded, an agent can push folders to on-chain storage, pull specific versions for inspection or rollback, watch a directory for bi-directional sync, and run rebate to compact a vector's archive — all without hand-holding on the commands. This is useful when you want an agent to persist its own working state, archive project snapshots, or coordinate versioned data across sessions. The skill also covers how to combine wdoublesync with [MemWal](https://github.com/MystenLabs/MemWal) for workflows.
+wdoublesync ships with a [SKILL.md](https://github.com/FizzyFlow/wdoublesync_cli/blob/main/SKILL.md) that teaches AI coding agents how to use it autonomously. Once loaded, an agent can push folders to on-chain storage, pull specific versions for inspection or rollback, watch a directory for bi-directional sync, and run rebate to compact a vector's archive — all without hand-holding on the commands. This is useful when you want an agent to persist its own working state, archive project snapshots, or coordinate versioned data across sessions. The skill also covers how to combine wdoublesync with [MemWal](https://github.com/MystenLabs/MemWal) for workflows.
 
 ## Installation
 
