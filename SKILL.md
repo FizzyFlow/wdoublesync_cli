@@ -1,6 +1,6 @@
 ---
 name: wdoublesync
-version: 0.1.7
+version: 0.1.8
 description: Claude agent skill for decentralized file storage, versioning, and sync on Sui + Walrus + Seal. Enables agents to push local folders as on-chain vectors, pull versions, manage Walrus storage, and watch for changes.
 keywords: [walrus, sui, storage, versioning, sync, seal-encryption, blockchain, defi]
 ---
@@ -22,7 +22,7 @@ An abstract virtual filesystem that synchronizes folder state on-chain via Sui +
 
 ## When NOT to Use
 
-- For **semantic/vector search over text** — if you need to index and search text by meaning, use [MemWal](https://raw.githubusercontent.com/MystenLabs/MemWal/refs/heads/dev/SKILL.md) instead (vector database with embeddings)
+- For **semantic/vector search over text** — if you need to index and search text by meaning, use [MemWal](https://raw.githubusercontent.com/MystenLabs/MemWal/refs/heads/dev/SKILL.md) instead (vector database with embeddings). You'd better use 'default' workspace for MemWal, no need to try to create one based on the current directory or doublesync state.
 
 ## MemWal + WDoubleSync
 
@@ -44,7 +44,9 @@ npm install -g @fizzyflow/wdoublesync_cli
 # Now use: wdoublesync <command> (installed from npm)
 ```
 
-After you have access to `wdoublesync`, you can run `wdoublesync --help` to see the available commands and options. Use `wdoublesync info` to check your currently connected wallet (`your wallet` field), if there's no - wallet, you can set one with `--key` or `--phrase` flags, or by exporting `WDOUBLESYNC_KEY` environment variable. Feel free to ask user to set up a wallet if they haven't done so yet, as it's required for push operations and pull encrypted vectors.
+After you have access to `wdoublesync`, you can run `wdoublesync --help` to see the available commands and options. Use `wdoublesync info` to check your currently connected wallet (`your wallet` field), if there's no wallet, you can set one with `--key` or `--phrase` flags, or by exporting `WDOUBLESYNC_KEY` environment variable. Feel free to ask user to set up a wallet if they haven't done so yet, as it's required for push operations and pull encrypted vectors.
+
+After wdoublesync is installed, ask the user to set up MemWal if they want.
 
 ### Set up your key (required for push and pull of encrypted vectors)
 
@@ -56,23 +58,21 @@ For **read-only public vectors**, the key is not required.
 
 ### Push a folder (creates new vector if no ID provided)
 
-Be sure to run this command from the folder you want to sync:
+Pass the path explicitly — no need to `cd` first:
 
 ```bash
-cd ~/my-folder
-wdoublesync push
-# Creates new vector + syncs current folder
+wdoublesync push ~/my-folder
+# Creates new vector + syncs folder
 # Output: created: 0x1234... / syncing ./ → 0x1234...
 ```
 
-This creates a new EndlessVector on-chain and pushes the current folder as a snapshot encrypted by Seal. The output will show the vector ID (e.g., `0x1234...`) which you can use for future pulls or pushes.
+This creates a new EndlessVector on-chain and pushes the folder as a snapshot encrypted by Seal. The output will show the vector ID (e.g., `0x1234...`) which you can use for future pulls or pushes. It's a good idea to save this ID to MemWal, with addition to the path info, so you can easily find it later when you want to pull or view the vector state. Ask a user if they want to set up MemWal if it's not available and you are going to push new vector.
 
 ### Pull a vector to restore it
 
 ```bash
-mkdir ~/restored-folder && cd ~/restored-folder
-wdoublesync pull 0x1234...
-# Restores vector to current directory
+wdoublesync pull 0x1234... ~/restored-folder
+# Restores vector to the specified folder
 ```
 
 ### View vector metadata
@@ -85,104 +85,84 @@ wdoublesync info 0x1234...
 ### Watch for changes (bi-directional sync)
 
 ```bash
-cd ~/my-data
-wdoublesync watch 0x1234... --poll-interval 5
-# Monitors local folder, auto-pushes changes
+wdoublesync watch 0x1234... ~/my-data --poll-interval 5
+# Monitors folder, auto-pushes changes
 # Checks remote every 5 seconds, auto-pulls updates
 ```
 
 ## API Surface
 
-All commands operate on the **current working directory** — `cd` into your folder first.
-
 | Command | Arguments | Use Case |
 |---------|-----------|----------|
-| **push** | `[vectorId]` `[options]` | Sync current folder to vector; creates new vector if no ID given |
-| **pull** | `vectorId` `[options]` | Restore vector (default: latest version) into current directory |
-| **info** | `[vectorId]` | No ID: show chain + wallet. With ID: full vector details |
-| **watch** | `vectorId` `[options]` | Bi-directional sync: auto-push local changes, auto-pull remote updates |
-| **rebate** | `vectorId` | Burn archive patches, push current folder as fresh single snapshot |
+| **push** | `[vectorId]` `[path]` `[options]` | Sync folder to vector; creates new vector if no ID given |
+| **pull** | `vectorId` `[path]` `[options]` | Restore vector (default: latest version) into folder |
+| **info** | `[vectorId]` `[path]` | No ID: show chain + wallet. With ID: full vector details |
+| **watch** | `vectorId` `[path]` `[options]` | Bi-directional sync: auto-push local changes, auto-pull remote updates |
+| **rebate** | `vectorId` `[path]` | Burn archive patches, push folder as fresh single snapshot |
 
 ### Command Examples
 
 #### push (create new vector)
 
 ```bash
-cd ~/my-data
-wdoublesync push
-# Syncs current folder as new vector
+wdoublesync push ~/my-data
 # Output: creating new EndlessVector on testnet...
 #         created: 0xabc123...
 #         syncing ./ → 0xabc123...
 ```
 
+#### push (to existing vector)
+
+```bash
+wdoublesync push 0x1234... ~/my-data
+```
+
 #### push (with manifest for faster change detection)
 
 ```bash
-cd ~/my-data
-wdoublesync push 0x1234... --manifest
-# Writes .wdoublesync manifest; faster change detection on future pushes
+wdoublesync push 0x1234... ~/my-data --manifest
 ```
 
 #### push (full snapshot, not incremental)
 
 ```bash
-cd ~/my-data
-wdoublesync push 0x1234... --force-snapshot
+wdoublesync push 0x1234... ~/my-data --force-snapshot
 # Uploads entire snapshot, useful if history is corrupted
 ```
 
 #### pull (latest version)
 
 ```bash
-mkdir ~/restored && cd ~/restored
-wdoublesync pull 0x1234...
-# Restores latest version to current directory
+wdoublesync pull 0x1234... ~/restored
 ```
 
 #### pull (specific version)
 
 ```bash
-cd ~/restored
-wdoublesync pull 0x1234... --version 10
-# Restores version 10 instead of latest
+wdoublesync pull 0x1234... ~/restored --version 10
 ```
 
 #### watch (bi-directional)
 
 ```bash
-cd ~/my-data
-wdoublesync watch 0x1234... --poll-interval 5
-# Monitors current folder, auto-pushes on change (debounce: 1000ms default)
+wdoublesync watch 0x1234... ~/my-data --poll-interval 5
+# Auto-pushes on change (debounce: 1000ms default)
 # Checks remote every 5 seconds, auto-pulls new versions
 # Runs indefinitely; stop with Ctrl+C
 ```
 
-#### watch (push-only)
+#### watch (push-only or pull-only)
 
 ```bash
-cd ~/my-data
-wdoublesync watch 0x1234... --push-only
-# Only auto-push on local changes, don't pull remote updates
-```
-
-#### watch (pull-only)
-
-```bash
-cd ~/my-data
-wdoublesync watch 0x1234... --pull-only
-# Only pull remote updates, don't auto-push local changes
+wdoublesync watch 0x1234... ~/my-data --push-only
+wdoublesync watch 0x1234... ~/my-data --pull-only
 ```
 
 #### rebate
 
-When user asks to rebate, you can explain that this command is useful after many incremental syncs to reclaim on-chain storage. It burns the archive history and pushes the current folder as a fresh single snapshot. Make sure user understands that after rebate, only the latest snapshot is available, and old patches will be burned.
-
 ```bash
-cd ~/my-data
-wdoublesync rebate 0x1234...
-# Burns archive history, pushes current folder as fresh single snapshot
-# Useful after many incremental syncs to reclaim on-chain storage
+wdoublesync rebate 0x1234... ~/my-data
+# Burns archive history, pushes folder as fresh single snapshot
 ```
 
 
@@ -217,14 +197,12 @@ wdoublesync rebate 0x1234...
 
 ```bash
 # 1. Push a folder (creates new vector on first push)
-cd ~/important-data
-wdoublesync push
+wdoublesync push ~/important-data
 # Output: creating new EndlessVector on testnet...
 #         created: 0xabc123...
 
 # 2. Verify by pulling to a fresh folder
-mkdir ~/verify-tmp && cd ~/verify-tmp
-wdoublesync pull 0xabc123...
+wdoublesync pull 0xabc123... ~/verify-tmp
 
 # 3. Check file counts match
 ls ~/important-data | wc -l
@@ -234,21 +212,18 @@ ls ~/verify-tmp | wc -l
 ### Workflow 2: Multi-version history and rollback
 
 ```bash
-cd ~/data
 # Push version 1
-wdoublesync push 0xabc123...
+wdoublesync push 0xabc123... ~/data
 
 # Make changes, push version 2
-echo "new file" > new.txt
-wdoublesync push 0xabc123...
+echo "new file" > ~/data/new.txt
+wdoublesync push 0xabc123... ~/data
 
 # List all versions
 wdoublesync info 0xabc123...
 
 # Rollback to version 1
-mkdir ~/data-v1 && cd ~/data-v1
-wdoublesync pull 0xabc123... --version 1
-# Folder now matches state from version 1
+wdoublesync pull 0xabc123... ~/data-v1 --version 1
 ```
 
 ### Workflow 3: Rebate to compact archive
@@ -256,28 +231,19 @@ wdoublesync pull 0xabc123... --version 1
 After many incremental syncs, archive grows with lots of patches. Rebate burns old data and rebuilds as single snapshot:
 
 ```bash
-# Before rebate: many small patches
 wdoublesync info 0xabc123...
 # Output: version 87, total size 45 MB (many patches)
 
-# Run rebate from current directory
-cd ~/data
-wdoublesync rebate 0xabc123...
+wdoublesync rebate 0xabc123... ~/data
 # Output: Burned 86 items, pushed version 88 (3.2 MB)
-
-# After rebate: single snapshot instead of 87 patches
-# Much more efficient for Walrus storage
+# Single snapshot instead of 87 patches — much more efficient
 ```
 
 ### Workflow 4: Watch for external changes
 
 ```bash
-# Another user pushes to the same vector
-# You want to auto-sync your local copy
-
-cd ~/data
-wdoublesync watch 0xabc123... --poll-interval 5
-# Monitors local folder for changes, auto-pushes them
+wdoublesync watch 0xabc123... ~/data --poll-interval 5
+# Monitors folder for changes, auto-pushes them
 # Also checks remote every 5 seconds for updates, auto-pulls
 # Press Ctrl+C to stop
 ```
@@ -290,8 +256,16 @@ wdoublesync watch 0xabc123... --poll-interval 5
 | **"vector-id is required"** | Command needs a vector ID but none provided | Pass the vector ID as the first argument: `wdoublesync pull 0x...` |
 | **"This vector is Seal-encrypted"** | Vector is encrypted but no key provided | Provide `--key` or `--phrase`, or export `WDOUBLESYNC_KEY` |
 | **"at() is out of range, this part of archive has been burned"** | Trying to restore a version whose archive was burned by rebate | Only the latest snapshot is available after rebate; pull without `--version` |
-| **Connection errors** | RPC endpoint unreachable or wrong chain | You may need to try again little later |
+| **Connection errors** | RPC endpoint unreachable or wrong chain | Check `--chain` flag; try again in a moment if the RPC is temporarily down |
+
 
 ## Links
 
 - **Repository**: https://github.com/FizzyFlow/wdoublesync_cli
+
+## Agent Guidelines
+
+- **Always run `wdoublesync` commands as standalone Bash calls** — never chain them with `&&`, `;`, or combine with file creation commands in the same shell invocation. Create files first in a separate tool call, then push in a dedicated call.
+- **Keep user posted**, After a successful push to an endless_vector, inform the user about the vector ID and the version that was just pushed. Also propose they view the current state in the browser by providing a link to the explorer, e.g. https://doublesync.wal.app/vector#testnet:0xafe7ab81339c9c4e5750f20708ef982ef553d9b20b17a85342e4af055661a852
+- **MemWal vector ID logging is critical on first push** — when a new vector is created, immediately propose saving the vector ID + local path to MemWal. Phrase it as: "Want me to save the vector ID and path to MemWal so we can find it later?" This is the most important MemWal step — without it the vector ID can be lost. Only skip if the user explicitly says no.
+- **MemWal version logging is mandatory after every push** — after every successful push, always propose saving a version description to MemWal. Phrase it as: "Want me to save a description of this version to MemWal?" and wait for the user response. Only skip if the user explicitly says no. Do not silently skip this step.
