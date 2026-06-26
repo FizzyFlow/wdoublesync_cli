@@ -66,7 +66,7 @@ wdoublesync push ~/my-folder
 # Output: created: 0x1234... / syncing ./ → 0x1234...
 ```
 
-This creates a new EndlessVector on-chain and pushes the folder as a snapshot encrypted by Seal. The output will show the vector ID (e.g., `0x1234...`) which you can use for future pulls or pushes. It's a good idea to save this ID to MemWal, with addition to the path info, so you can easily find it later when you want to pull or view the vector state. Ask a user if they want to set up MemWal if it's not available and you are going to push new vector.
+This creates a new EndlessVector on-chain and pushes the folder as a snapshot encrypted by Seal. To create a **public** vector instead — unencrypted, pullable without a key and browsable from the dApp — add `--no-seal` (only effective on creation). The output will show the vector ID (e.g., `0x1234...`) which you can use for future pulls or pushes. It's a good idea to save this ID to MemWal, with addition to the path info, so you can easily find it later when you want to pull or view the vector state. Ask a user if they want to set up MemWal if it's not available and you are going to push new vector.
 
 ### Pull a vector to restore it
 
@@ -109,6 +109,14 @@ wdoublesync push ~/my-data
 # Output: creating new EndlessVector on testnet...
 #         created: 0xabc123...
 #         syncing ./ → 0xabc123...
+```
+
+#### push (create public, unencrypted vector)
+
+```bash
+wdoublesync push ~/my-data --no-seal
+# Creates a public vector — anyone can pull it without a key, or browse it from the dApp.
+# Only effective on creation; ignored when pushing to an existing vector.
 ```
 
 #### push (to existing vector)
@@ -176,6 +184,7 @@ wdoublesync rebate 0x1234... ~/my-data
 | `--key` | Sui private key (`suiprivkey1...`) | — | Sign transactions (or use env vars) |
 | `--phrase` | Mnemonic phrase | — | Alternative: derive key from mnemonic |
 | `--no-compress` | — | — | Push: disable gzip compression |
+| `--no-seal` | — | — | Push: create a new vector public (no Seal encryption). Only applies when creating a vector; ignored for existing ones |
 | `--manifest` | — | — | Push: write/use `.wdoublesync` file for faster change detection |
 | `--force-snapshot` | — | — | Push: full snapshot (repairs corrupt vectors) |
 | `--version` | Number | `latest` | Pull: restore specific version instead of latest |

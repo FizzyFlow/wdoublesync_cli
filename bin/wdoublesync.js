@@ -29,6 +29,7 @@ Options:
   --version <n>             Version to restore (pull only, default: latest)
   --exclude <p1,p2>         Extra exclude patterns (comma-separated)
   --no-compress             Disable gzip compression
+  --no-seal                 Create a new vector public (no Seal encryption); only applies on creation
   --manifest                Write/use .wdoublesync manifest for faster change detection
   --force-snapshot          Push a full snapshot regardless of prior history (repairs corrupt vectors)
   --poll-interval <s>       Watch: seconds between remote checks (default: 2)
@@ -49,6 +50,7 @@ function parseArgs(argv) {
         version: null,
         exclude: null,
         compress: 'gzip',
+        seal: true,
         manifest: false,
         forceSnapshot: false,
         pollInterval: 2,
@@ -100,6 +102,8 @@ function parseArgs(argv) {
             args.exclude = raw[++i];
         } else if (flag === '--no-compress') {
             args.compress = false;
+        } else if (flag === '--no-seal') {
+            args.seal = false;
         } else if (flag === '--manifest') {
             args.manifest = true;
         } else if (flag === '--force-snapshot') {

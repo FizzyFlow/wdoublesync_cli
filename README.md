@@ -40,6 +40,7 @@ The `[path]` argument is optional — if omitted, the current working directory 
 | `--version <n>` | Version to restore (`pull` only, default: latest) |
 | `--exclude <p1,p2>` | Extra exclude patterns (comma-separated) |
 | `--no-compress` | Disable gzip compression |
+| `--no-seal` | Create a new vector public (no Seal encryption). Only applies when creating; ignored for existing vectors |
 | `--manifest` | Write/use `.wdoublesync` manifest for faster change detection |
 | `--force-snapshot` | Push a full snapshot regardless of prior history (repairs a corrupt vector) |
 | `--poll-interval <s>` | `watch`: seconds between remote version checks (default: `2`) |
@@ -72,6 +73,12 @@ wdoublesync push ~/my-project --chain testnet --key suiprivkey1...
 # prints the new vector id, e.g.:
 #   created: 0xabc123...
 #   version 1 pushed (full snapshot, gzip compressed)
+```
+
+By default a new vector is Seal-encrypted. To create a public (unencrypted) vector that anyone can pull without a key:
+
+```bash
+wdoublesync push --chain testnet --key suiprivkey1... --no-seal
 ```
 
 ### Push an update
